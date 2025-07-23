@@ -507,6 +507,18 @@
 				Emitted when the size of the viewport is changed, whether by resizing of window, or some other means.
 			</description>
 		</signal>
+		<signal name="pre_draw">
+			<param index="0" name="viewport" type="Viewport" />
+			<description>
+				Emitted just before this viewport is drawn, and just before the [signal SceneTree.viewport_pre_draw] signal on [SceneTree].
+			</description>
+		</signal>
+		<signal name="post_draw">
+			<param index="0" name="viewport" type="Viewport" />
+			<description>
+				Emitted just after this viewport is drawn, and just before the [signal SceneTree.viewport_post_draw] signal on [SceneTree].
+			</description>
+		</signal>
 	</signals>
 	<constants>
 		<constant name="SHADOW_ATLAS_QUADRANT_SUBDIV_DISABLED" value="0" enum="PositionalShadowAtlasQuadrantSubdiv">

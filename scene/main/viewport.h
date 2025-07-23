@@ -749,6 +749,9 @@ private:
 	Camera2D *camera_2d = nullptr;
 	void _camera_2d_set(Camera2D *p_camera_2d);
 
+	void _render_server_pre_draw(RID p_viewport_rid);
+	void _render_server_post_draw(RID p_viewport_rid);
+
 #ifndef PHYSICS_2D_DISABLED
 	// Collider to frame
 	HashMap<ObjectID, uint64_t> physics_2d_mouseover;

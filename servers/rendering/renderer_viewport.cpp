@@ -313,6 +313,7 @@ void RendererViewport::_draw_3d(Viewport *p_viewport) {
 }
 
 void RendererViewport::_draw_viewport(Viewport *p_viewport) {
+	RS::get_singleton()->emit_signal("viewport_pre_draw", p_viewport->self);
 	if (p_viewport->measure_render_time) {
 		String rt_id = "vp_begin_" + itos(p_viewport->self.get_id());
 		RSG::utilities->capture_timestamp(rt_id);
@@ -722,6 +723,7 @@ void RendererViewport::_draw_viewport(Viewport *p_viewport) {
 		RSG::utilities->capture_timestamp(rt_id);
 		timestamp_vp_map[rt_id] = p_viewport->self;
 	}
+	RS::get_singleton()->emit_signal("viewport_post_draw", p_viewport->self);
 }
 
 void RendererViewport::draw_viewports(bool p_swap_buffers) {

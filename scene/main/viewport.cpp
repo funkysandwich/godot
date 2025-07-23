@@ -556,6 +556,8 @@ void Viewport::_notification(int p_what) {
 #endif // _3D_DISABLED
 
 			add_to_group("_viewports");
+			RenderingServer::get_singleton()->connect("viewport_pre_draw", callable_mp(this, &Viewport::_render_server_pre_draw));
+			RenderingServer::get_singleton()->connect("viewport_post_draw", callable_mp(this, &Viewport::_render_server_post_draw));
 #if !defined(PHYSICS_2D_DISABLED) || !defined(PHYSICS_3D_DISABLED)
 			if (get_tree()->is_debugging_collisions_hint()) {
 #ifndef PHYSICS_2D_DISABLED
@@ -633,7 +635,8 @@ void Viewport::_notification(int p_what) {
 
 			remove_from_group("_viewports");
 			set_physics_process_internal(false);
-
+			RenderingServer::get_singleton()->disconnect("viewport_pre_draw", callable_mp(this, &Viewport::_render_server_pre_draw));
+			RenderingServer::get_singleton()->disconnect("viewport_post_draw", callable_mp(this, &Viewport::_render_server_post_draw));
 			RS::get_singleton()->viewport_set_active(viewport, false);
 			RenderingServer::get_singleton()->viewport_set_parent_viewport(viewport, RID());
 		} break;
@@ -1013,6 +1016,20 @@ void Viewport::_process_picking() {
 RID Viewport::get_viewport_rid() const {
 	ERR_READ_THREAD_GUARD_V(RID());
 	return viewport;
+}
+
+void Viewport::_render_server_pre_draw(RID p_viewport_rid) {
+	if (p_viewport_rid == get_viewport_rid()) {
+		emit_signal("pre_draw", this);
+		get_tree()->emit_signal("viewport_pre_draw", this);
+	}
+}
+
+void Viewport::_render_server_post_draw(RID p_viewport_rid) {
+	if (p_viewport_rid == get_viewport_rid()) {
+		emit_signal("post_draw", this);
+		get_tree()->emit_signal("viewport_post_draw", this);
+	}
 }
 
 void Viewport::update_canvas_items() {
@@ -5190,6 +5207,9 @@ void Viewport::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("size_changed"));
 	ADD_SIGNAL(MethodInfo("gui_focus_changed", PropertyInfo(Variant::OBJECT, "node", PROPERTY_HINT_RESOURCE_TYPE, "Control")));
 
+	ADD_SIGNAL(MethodInfo("pre_draw", PropertyInfo(Variant::OBJECT, "viewport", PROPERTY_HINT_RESOURCE_TYPE, "Viewport")));
+	ADD_SIGNAL(MethodInfo("post_draw", PropertyInfo(Variant::OBJECT, "viewport", PROPERTY_HINT_RESOURCE_TYPE, "Viewport")));
+
 	BIND_ENUM_CONSTANT(SHADOW_ATLAS_QUADRANT_SUBDIV_DISABLED);
 	BIND_ENUM_CONSTANT(SHADOW_ATLAS_QUADRANT_SUBDIV_1);
 	BIND_ENUM_CONSTANT(SHADOW_ATLAS_QUADRANT_SUBDIV_4);
@@ -5512,7 +5532,7 @@ void SubViewport::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_ENTER_TREE: {
 			RS::get_singleton()->viewport_set_active(get_viewport_rid(), true);
-
+			
 			SubViewportContainer *parent_svc = Object::cast_to<SubViewportContainer>(get_parent());
 			if (parent_svc) {
 				parent_svc->recalc_force_viewport_sizes();

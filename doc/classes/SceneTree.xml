@@ -327,6 +327,18 @@
 				Emitted immediately before [method Node._process] is called on every node in this tree.
 			</description>
 		</signal>
+		<signal name="viewport_pre_draw">
+			<param index="0" name="viewport" type="Viewport" />
+			<description>
+				Emitted immediately before drawing a [Viewport] node after [signal Viewport.pre_draw] viewport is the [Viewport] about to be drawn.
+			</description>
+		</signal>
+		<signal name="viewport_post_draw">
+			<param index="0" name="viewport" type="Viewport" />
+			<description>
+				Emitted immediately after drawing a Viewport node after [signal Viewport.post_draw] viewport is the [Viewport] that was just drawn.
+			</description>
+		</signal>
 		<signal name="scene_changed">
 			<description>
 				Emitted after the new scene is added to scene tree and initialized. Can be used to reliably access [member current_scene] when changing scenes.
